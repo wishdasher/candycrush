@@ -122,6 +122,9 @@ main {
 	border: 1px solid grey;
 	margin-left: -1px;
 	margin-bottom: -1px;
+	/*below two properties added for firefox...*/
+	max-height: 50px;
+	max-width: 50px
 }
 
 #controls {
@@ -189,7 +192,7 @@ main {
 .disabled {
 	color: var(--color-dark-grey) !important;
 	background-color: var(--color-light-grey) !important;
-	outline: 0 !important;
+	/*outline: 0 !important;*/
 }
 
 button {

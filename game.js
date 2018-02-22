@@ -45,7 +45,7 @@ Util.events(document, {
 			element.addEventListener('click', (evt) => {
 				let input = document.getElementById("input-move");
 				let inputText = input.value.toLowerCase();
-				let dir = evt.srcElement.id;
+				let dir = element.id;
 				let candy = getCandyForInput(inputText);
 				// figure out if we can actually move, yo
 				if (rules.isMoveTypeValid(candy, dir)) { //TODO: remove because we now disable the button for an invalid move
