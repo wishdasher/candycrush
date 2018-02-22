@@ -24,7 +24,6 @@ Util.events(document, {
 	// Final initalization entry point: the Javascript code inside this block
 	// runs at the end of start-up when the DOM is ready
 	"DOMContentLoaded": function() {
-
 		// Draw grid
 		drawGrid();
 
@@ -34,6 +33,11 @@ Util.events(document, {
 		// Add events
 		Util.one("#start").addEventListener("click", () => {
 			rules.prepareNewGame();
+			let input = document.getElementById("input-move");
+			input.value = "";
+			disableAllDirButtons();
+			checkCrushState();
+			input.focus();
 		});
 
 		// give each direction button a listener for when it is clicked
@@ -56,12 +60,14 @@ Util.events(document, {
 
 		Util.one("#crush").addEventListener("click", () => {
 			rules.removeCrushes(rules.getCandyCrushes());
-			setTimeout(handleMoveCandies(checkCrushState), 500);
+			setTimeout(handleMoveCandies, 500, checkCrushState);
 		});
 
 		// always start with a game
 		rules.prepareNewGame();
+		disableAllDirButtons();
 		checkCrushState();
+		document.getElementById("input-move").focus();
 	},
 
 	// Keyboard events arrive here
@@ -201,7 +207,9 @@ var disableDirControls = () => {
 	// disable buttles
 	disableAllDirButtons();
 	// disable input
-	document.getElementById("input-cell").disabled = true;
+	let input = document.getElementById("input-move");
+	input.classList.add("disabled");
+	input.disabled = true;
 }
 
 var disableAllDirButtons = () => {
@@ -226,13 +234,15 @@ var disableButton = (id) => {
 var checkCrushState = () => {
 	let crushes = rules.getCandyCrushes();
 	if (crushes.length > 0) {
-		console.log("crush enable");
 		enableButton("crush");
 		disableDirControls();
 	} else {
-		console.log("crush disable");
 		disableButton("crush");
-		document.getElementById("input-cell").disabled = false;
+		// re-enable input
+		let input = document.getElementById("input-move");
+		input.classList.remove("disabled");
+		input.disabled = false;
+		input.focus();
 		// validateDirButtons();
 	}
 }

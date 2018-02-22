@@ -8,6 +8,8 @@
 	--color-blue: hsl(210, 80%, 45%);
 	--color-purple: purple;
 	--color-accent: #3399ff;
+	--color-dark-grey: #666666;
+	--color-light-grey: #d3d3d3;
 	--duration-move: .1s; /* Duration to move by 1 cell */
 	--duration-fade: .4s;
 
@@ -161,7 +163,6 @@ main {
 	padding: 0;
 	text-align: center;
 	border-radius: var(--radius);
-
 	outline: 1px solid grey;
 }
 
@@ -170,6 +171,10 @@ main {
 	font-weight: bold;
 	color: white;
 	background-color: var(--color-orange);
+}
+
+.dir {
+	color: white;
 }
 
 .control {
@@ -182,8 +187,9 @@ main {
 }
 
 .disabled {
-	color: white;
-	background-color: grey !important;
+	color: var(--color-dark-grey) !important;
+	background-color: var(--color-light-grey) !important;
+	outline: 0 !important;
 }
 
 button {
