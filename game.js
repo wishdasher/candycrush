@@ -33,6 +33,7 @@ Util.events(document, {
 		// Add events
 		Util.one("#start").addEventListener("click", () => {
 			rules.prepareNewGame();
+			// reset all other fields
 			let input = document.getElementById("input-move");
 			input.value = "";
 			disableAllDirButtons();
@@ -58,6 +59,7 @@ Util.events(document, {
 			});
 		});
 
+		// crush listener, implemented with timeout and callback
 		Util.one("#crush").addEventListener("click", () => {
 			let button = document.getElementById("crush");
 			button.classList.add("disabled");
@@ -180,6 +182,7 @@ var removeAllChildren = (node) => {
 	}
 }
 
+// given the input, figure out what to do about buttons
 var validateInput = () => {
 	let input = document.getElementById("input-move");
 	let inputText = input.value.toLowerCase();
@@ -195,6 +198,8 @@ var validateInput = () => {
 }
 
 const dirs = ["up", "left", "right", "down"]
+
+// check if directional buttons should be enabled or disabled
 var validateDirButtons = (inputText) => {
 	for (let i = 0; i < dirs.length; i++) {
 		let candy = getCandyForInput(inputText);
@@ -206,6 +211,7 @@ var validateDirButtons = (inputText) => {
 	}
 }
 
+// disable all directional controls, including the input field
 var disableDirControls = () => {
 	// disable buttles
 	disableAllDirButtons();
@@ -215,25 +221,28 @@ var disableDirControls = () => {
 	input.disabled = true;
 }
 
+// disable all the directional buttons
 var disableAllDirButtons = () => {
 	for (let i = 0; i < dirs.length; i++) {
 		disableButton(dirs[i]);
 	}
 }
 
-// takes button dir ID to validate
+// takes button dID to enable
 var enableButton = (id) => {
 	let element = document.getElementById(id);
 	element.disabled = false;
 	element.classList.remove("disabled");
 }
 
+// takes button ID to disable
 var disableButton = (id) => {
 	let element = document.getElementById(id);
 	element.disabled = true;
 	element.classList.add("disabled");
 }
 
+// check crush state, re-enable and disable components as necessary
 var checkCrushState = () => {
 	let crushes = rules.getCandyCrushes();
 	if (crushes.length > 0) {
@@ -246,7 +255,6 @@ var checkCrushState = () => {
 		input.classList.remove("disabled");
 		input.disabled = false;
 		input.focus();
-		// validateDirButtons();
 	}
 }
 
@@ -255,6 +263,7 @@ var getCandyForInput = (inputText) => {
 	return board.getCandyAt(parseInt(inputText[1]) - 1, getColNumber(inputText[0]));
 }
 
+// can accommodate a callback function after moving candies down
 var handleMoveCandies = (callback) => {
 	rules.moveCandiesDown();
 	if (callback) {
