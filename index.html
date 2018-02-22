@@ -32,16 +32,42 @@ PS2 - CandyCrush UI
 <body>
 
 <header>
-  Column 1
+  <!--do something -->
 </header>
 
 <main>
-  Column 2
+  <div id="gen" class="panel">
+    <h1 id="title"> Candy Crush! </h1>
+    <button id="start" class="button">
+        New Game
+    </button>
+  </div>
+
+
+  <div id="game" class="panel">
+    <div id="board">
+
+    </div>
+  </div>
+
+  <div id="controls" class="panel">
+
+    <div id="dir-panel">
+      <button id="up" class="button control dir" type="submit">▲</button>
+
+      <button id="left" class="button control dir" type="submit">◄</button>
+      <input id="input-move" class="control" type="text">
+      <button id="right" class="button control dir" type="submit">►</button>
+
+      <button id="down" class="button control dir" type="submit">▼</button>
+
+      <button id="crush" class="button control" type="submit">Crush once</button>
+
+    </div>
+  </div>
+
 </main>
 
-<div id="controls">
-  Column 3
-</div>
 
 </body>
 
