@@ -59,6 +59,9 @@ Util.events(document, {
 		});
 
 		Util.one("#crush").addEventListener("click", () => {
+			let button = document.getElementById("crush");
+			button.classList.add("disabled");
+			button.disabled = true;
 			rules.removeCrushes(rules.getCandyCrushes());
 			setTimeout(handleMoveCandies, 500, checkCrushState);
 		});
