@@ -19,8 +19,6 @@
 
 	--size: 8;
 
-	--duration-fade: .3s;
-
 }
 
 html {
@@ -76,7 +74,7 @@ main {
 }
 
 #start {
-	background-color: var(--color-blue);
+	background-color: var(--color-red);
 	width: 130px;
 }
 
@@ -148,7 +146,7 @@ main {
 	border: 1px solid grey;
 	margin-left: -1px;
 	margin-bottom: -1px;
-	/*below two properties added for firefox...*/
+
 	max-width: calc(400px / (var(--size) + 1));
 	max-height: calc(400px / (var(--size) + 1));
 }
@@ -156,7 +154,6 @@ main {
 #controls {
 	grid-column: 3;
 	max-width: 80vw;
-	/*background-color: blue;*/
 }
 
 #dir-panel {

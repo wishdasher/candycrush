@@ -19,7 +19,7 @@ var rules = new Rules(board);
 
 var hintElems = [];
 
-let durationFactor = 0.3;
+let durationFactor = 0.15;
 
 //TODO: figure out when to add crush state check
 
@@ -53,12 +53,11 @@ Util.events(document, {
 				let row = hintCandies[i].row;
 				let col = hintCandies[i].col;
 				let img = getCandyImgFromRowCol(row, col);
-				window.requestAnimationFrame(() => {
-					// apply asynchronously
-					img.classList.add("anim-hint");
-				});
 				hintElems.push(img);
 			}
+			window.requestAnimationFrame(() => {
+				hintElems.forEach(e => e.classList.add("anim-hint"));
+			});
 			let input = document.getElementById("input-move");
 			input.focus();
 		});
@@ -97,17 +96,20 @@ Util.events(document, {
 					let row = crushes[i][j].row;
 					let col = crushes[i][j].col;
 					let img = getCandyImgFromRowCol(row, col);
-					window.requestAnimationFrame(() =>
-						img.classList.add("anim-fade"));
 					elements.push(img);
 				}
 			}
-			Util.afterAnimation(elements, "fade").then(() => {
-				elements.forEach(e => e.classList.remove("anim-fade"));
-				rules.removeCrushes(crushes);
-				rules.moveCandiesDown();
-				checkCrushState();
+			window.requestAnimationFrame(() => {
+				elements.forEach(e => e.classList.add("anim-fade"));
+				Util.afterAnimation(elements, "fade").then(() => {
+					// TODO: Is this necessary? they all get deleted
+					elements.forEach(e => e.classList.remove("anim-fade"));
+					rules.removeCrushes(crushes);
+					rules.moveCandiesDown();
+					checkCrushState();
+				});
 			});
+
 		});
 
 		startGame();
@@ -181,12 +183,11 @@ var handleCandyIn = (detail) => {
 		img.style.setProperty("--xmove", xmove * cellSize + "px");
 		img.style.setProperty("--ymove", ymove * cellSize + "px");
 		img.style.setProperty("--duration-move", duration + "s");
-		window.requestAnimationFrame(() =>
-			img.classList.add("anim-move"));
-		Util.afterAnimation(img, "slide").then(() => {
-			console.log(img);
-			img.classList.remove("anim-move");
-			console.log(img.classList);
+		window.requestAnimationFrame(() => {
+			img.classList.add("anim-move");
+			Util.afterAnimation(img, "slide").then(() => {
+				img.classList.remove("anim-move");
+			});
 		});
 	}
 }
@@ -337,10 +338,7 @@ var disableButton = (id) => {
 }
 
 var disableHints = () => {
-	for (let i = 0; i < hintElems.length; i++) {
-		hintElems[i].classList.remove("anim-hint");
-	}
-	// clear
+	hintElems.forEach(e => e.classList.remove("anim-hint"));
 	hintElems.length = 0;
 }
 
