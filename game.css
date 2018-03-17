@@ -242,6 +242,9 @@ button {
 	max-height:100%;
 }
 
+/*
+ANIMATION CLASSES
+*/
 .anim-hint {
 	animation: pulse 1.2s infinite;
 }

@@ -55,9 +55,11 @@ Util.events(document, {
 				let img = getCandyImgFromRowCol(row, col);
 				hintElems.push(img);
 			}
+			// add hint animation
 			window.requestAnimationFrame(() => {
 				hintElems.forEach(e => e.classList.add("anim-hint"));
 			});
+			// focus input cell
 			let input = document.getElementById("input-move");
 			input.focus();
 		});
@@ -89,7 +91,7 @@ Util.events(document, {
 			button.disabled = true;
 			let crushes = rules.getCandyCrushes();
 			checkAvailableMoves();
-			// attach fade-out animation
+
 			let elements = [];
 			for (let i = 0; i < crushes.length; i++) {
 				for (let j = 0; j < crushes[i].length; j++) {
@@ -99,10 +101,11 @@ Util.events(document, {
 					elements.push(img);
 				}
 			}
+			// attach fade-out animation
 			window.requestAnimationFrame(() => {
 				elements.forEach(e => e.classList.add("anim-fade"));
 				Util.afterAnimation(elements, "fade").then(() => {
-					// TODO: Is this necessary? they all get deleted
+					// TODO: Is this necessary? they all get deleted anyways
 					elements.forEach(e => e.classList.remove("anim-fade"));
 					rules.removeCrushes(crushes);
 					rules.moveCandiesDown();
@@ -111,7 +114,7 @@ Util.events(document, {
 			});
 
 		});
-
+		// start game with page loads
 		startGame();
 	},
 
@@ -126,9 +129,9 @@ Util.events(document, {
 	}
 });
 
+// start a new game, resets fields, scores
 var startGame = () => {
 	rules.prepareNewGame();
-	// reset all other fields
 	board.resetScore();
 	disableAllDirButtons();
 	checkCrushState();
@@ -162,27 +165,32 @@ Util.events(board, {
 	"scoreUpdate": function(e) {
 		Util.one("#score").textContent = e.detail.score;
 		Util.one("#scoreboard").className = "gen-module";
+		// if there is a candy, otherwise we started with beginning grey
 		if (e.detail.candy) {
 			Util.one("#scoreboard").classList.add(e.detail.candy.color);
 		}
 	},
 });
 
+// for an add or move event, handle the candy switching and accompanying animations
 var handleCandyIn = (detail) => {
 	setCandy(detail);
 	if (detail.fromCol != null && detail.fromRow != null) {
 		let candyCell = Util.one(".candy-cell");
 		let cellSize = getComputedStyle(candyCell).getPropertyValue("width").replace(/px/,"");
 
-
+		// animate candy from original location to current location
+		// we grab the candy image from the new location
 		let img = getCandyImgFromRowCol(detail.toRow, detail.toCol);
 		let xmove = (detail.fromCol - detail.toCol);
 		let ymove = (detail.fromRow - detail.toRow);
 		let duration = Math.max(Math.abs(xmove), Math.abs(ymove)) * durationFactor;
 
+		// set move distance and move duration needed
 		img.style.setProperty("--xmove", xmove * cellSize + "px");
 		img.style.setProperty("--ymove", ymove * cellSize + "px");
 		img.style.setProperty("--duration-move", duration + "s");
+
 		window.requestAnimationFrame(() => {
 			img.classList.add("anim-move");
 			Util.afterAnimation(img, "slide").then(() => {
@@ -192,6 +200,7 @@ var handleCandyIn = (detail) => {
 	}
 }
 
+// set candy from old location to new location in the div cells
 var setCandy = (detail) => {
 	let row = detail.toRow;
 	let col = detail.toCol;
@@ -281,6 +290,7 @@ var validateInput = () => {
 	}
 }
 
+// figure out custom regexes given the board size
 var inputTextValid = (inputText) => {
 	let re;
 	if (size < 10) {
@@ -359,7 +369,8 @@ var checkCrushState = () => {
 	}
 }
 
-checkAvailableMoves = () => {
+// if there is no valid moves, disable the hint button
+var checkAvailableMoves = () => {
 	if (rules.getRandomValidMove()) {
 		enableButton("hint");
 	} else {
@@ -374,16 +385,7 @@ var getCandyForInput = (inputText) => {
 
 var getCandyImgFromRowCol = (row, col) => {
 	let cell = document.getElementById(getCellID(row, col));
-	//TODO someway better?
+	//TODO some better method?
 	let img = cell.childNodes[0];
 	return img;
-}
-
-// can accommodate a callback function after moving candies down
-// TODO REMOVE:
-var handleMoveCandies = (callback) => {
-	rules.moveCandiesDown();
-	if (callback) {
-		callback();
-	}
 }
