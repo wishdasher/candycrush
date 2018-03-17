@@ -19,6 +19,8 @@ var rules = new Rules(board);
 
 var hintElems = [];
 
+let durationFactor = 0.3;
+
 //TODO: figure out when to add crush state check
 
 // Attaching events on document because then we can do it without waiting for
@@ -50,16 +52,15 @@ Util.events(document, {
 			for (let i = 0; i < hintCandies.length; i++) {
 				let row = hintCandies[i].row;
 				let col = hintCandies[i].col;
-				let cell = document.getElementById(getCellID(row, col));
-				// TODO: better way to do this?
-				let img = cell.childNodes[0];
+				let img = getCandyImgFromRowCol(row, col);
 				window.requestAnimationFrame(() => {
 					// apply asynchronously
-					img.classList.add("hint-anim");
-
+					img.classList.add("anim-hint");
 				});
 				hintElems.push(img);
 			}
+			let input = document.getElementById("input-move");
+			input.focus();
 		});
 
 		// give each direction button a listener for when it is clicked
@@ -87,9 +88,26 @@ Util.events(document, {
 			let button = document.getElementById("crush");
 			button.classList.add("disabled");
 			button.disabled = true;
-			rules.removeCrushes(rules.getCandyCrushes());
+			let crushes = rules.getCandyCrushes();
 			checkAvailableMoves();
-			setTimeout(handleMoveCandies, 500, checkCrushState);
+			// attach fade-out animation
+			let elements = [];
+			for (let i = 0; i < crushes.length; i++) {
+				for (let j = 0; j < crushes[i].length; j++) {
+					let row = crushes[i][j].row;
+					let col = crushes[i][j].col;
+					let img = getCandyImgFromRowCol(row, col);
+					window.requestAnimationFrame(() =>
+						img.classList.add("anim-fade"));
+					elements.push(img);
+				}
+			}
+			Util.afterAnimation(elements, "fade").then(() => {
+				elements.forEach(e => e.classList.remove("anim-fade"));
+				rules.removeCrushes(crushes);
+				rules.moveCandiesDown();
+				checkCrushState();
+			});
 		});
 
 		startGame();
@@ -122,20 +140,18 @@ var startGame = () => {
 Util.events(board, {
 	// add a candy to the board
 	"add": function(e) {
-		setCandy(e.detail);
+		handleCandyIn(e.detail);
 	},
 
 	// move a candy from location 1 to location 2
 	"move": function(e) {
-		setCandy(e.detail);
-		// TODO work on here
+		handleCandyIn(e.detail);
 	},
 
 	// remove a candy from the board
 	"remove": function(e) {
-		let detail = e.detail;
-		let row = detail.fromRow;
-		let col = detail.fromCol;
+		let row = e.detail.fromRow;
+		let col = e.detail.fromCol;
 		let cell = document.getElementById(getCellID(row, col));
 		removeAllChildren(cell);
 	},
@@ -149,6 +165,31 @@ Util.events(board, {
 		}
 	},
 });
+
+var handleCandyIn = (detail) => {
+	setCandy(detail);
+	if (detail.fromCol != null && detail.fromRow != null) {
+		let candyCell = Util.one(".candy-cell");
+		let cellSize = getComputedStyle(candyCell).getPropertyValue("width").replace(/px/,"");
+
+
+		let img = getCandyImgFromRowCol(detail.toRow, detail.toCol);
+		let xmove = (detail.fromCol - detail.toCol);
+		let ymove = (detail.fromRow - detail.toRow);
+		let duration = Math.max(Math.abs(xmove), Math.abs(ymove)) * durationFactor;
+
+		img.style.setProperty("--xmove", xmove * cellSize + "px");
+		img.style.setProperty("--ymove", ymove * cellSize + "px");
+		img.style.setProperty("--duration-move", duration + "s");
+		window.requestAnimationFrame(() =>
+			img.classList.add("anim-move"));
+		Util.afterAnimation(img, "slide").then(() => {
+			console.log(img);
+			img.classList.remove("anim-move");
+			console.log(img.classList);
+		});
+	}
+}
 
 var setCandy = (detail) => {
 	let row = detail.toRow;
@@ -174,6 +215,7 @@ var drawGrid = () => {
 			if (r == 0 && !(c == 0)) {
 				cell.innerHTML = getColLetter(c - 1);
 				cell.setAttribute("class", "text-cell");
+				cell.classList.add("high-z-index");
 
 			} else if (c == 0 && !(r == 0)) {
 				// only place we use 1-indexing
@@ -296,7 +338,7 @@ var disableButton = (id) => {
 
 var disableHints = () => {
 	for (let i = 0; i < hintElems.length; i++) {
-		hintElems[i].classList.remove("hint-anim");
+		hintElems[i].classList.remove("anim-hint");
 	}
 	// clear
 	hintElems.length = 0;
@@ -321,10 +363,8 @@ var checkCrushState = () => {
 
 checkAvailableMoves = () => {
 	if (rules.getRandomValidMove()) {
-		console.log("YES");
 		enableButton("hint");
 	} else {
-		console.log("NO");
 		disableButton("hint");
 	}
 }
@@ -334,7 +374,15 @@ var getCandyForInput = (inputText) => {
 	return board.getCandyAt(parseInt(inputText[1]) - 1, getColNumber(inputText[0]));
 }
 
+var getCandyImgFromRowCol = (row, col) => {
+	let cell = document.getElementById(getCellID(row, col));
+	//TODO someway better?
+	let img = cell.childNodes[0];
+	return img;
+}
+
 // can accommodate a callback function after moving candies down
+// TODO REMOVE:
 var handleMoveCandies = (callback) => {
 	rules.moveCandiesDown();
 	if (callback) {

@@ -19,8 +19,7 @@
 
 	--size: 8;
 
-	--duration-move: 2s;
-	--duration-fade: 2s;
+	--duration-fade: .3s;
 
 }
 
@@ -106,6 +105,10 @@ main {
 	max-width: 80vw;
 	max-height: 80vw;
 
+	padding: 1px;
+
+	overflow: hidden;
+
 	display: grid;
 	grid-template-rows: repeat(calc(var(--size) + 1), 1fr);
 	grid-template-columns: repeat(calc(var(--size) + 1), 1fr);
@@ -119,12 +122,22 @@ main {
 
 .text-cell {
 	background-color: white;
+	opacity: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-weight: bold;
 	font-family: Arial;
 	font-size: calc(200px / (var(--size) + 1));
+}
+
+/* to mask incoming candies */
+.high-z-index {
+	z-index: 10;
+}
+
+.low-z-index {
+	z-index: -1;
 }
 
 .candy-cell {
@@ -232,7 +245,7 @@ button {
 	max-height:100%;
 }
 
-.hint-anim {
+.anim-hint {
 	animation: pulse 1.2s infinite;
 }
 
@@ -242,9 +255,35 @@ button {
     filter: saturate(100%);
   }
   50% {
-    transform: scale(1.15);
-    filter: saturate(200%);
+    transform: scale(1.2);
+    filter: saturate(300%);
   }
+}
+
+.anim-fade {
+	animation: fade var(--duration-fade);
+}
+
+@keyframes fade {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+.anim-move {
+	animation: slide var(--duration-move);
+}
+
+@keyframes slide {
+	0% {
+		transform: translate(var(--xmove), var(--ymove));
+	}
+	100% {
+		transform: translate(0px, 0px);
+	}
 }
 
 @media only screen and (max-width: 875px) and (min-width: 431px) {
@@ -302,7 +341,7 @@ button {
 /* color classes */
 .red { background-color: var(--color-red) !important; }
 .orange { background-color: var(--color-orange) !important; }
-.yellow { background-color: var(--color-yellow) !important; 
+.yellow { background-color: var(--color-yellow) !important;
 	color: var(--color-accent) !important; }
 .green { background-color: var(--color-green) !important; }
 .blue { background-color: var(--color-blue) !important; }
