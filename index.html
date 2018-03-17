@@ -29,7 +29,7 @@ PS2 - CandyCrush UI
 
 </head>
 
-<body>
+<body id="body">
 
 <header>
   <!--do something -->
@@ -38,9 +38,18 @@ PS2 - CandyCrush UI
 <main>
   <div id="gen" class="panel">
     <h1 id="title"> Candy Crush! </h1>
-    <button id="start" class="button">
+    <div id="scoreboard" class="gen-module"> 
+      <div id="score"> 0 </div>
+      <div id="point-label"> points </div>
+    </div>
+    <div id="gen-buttons">
+      <button id="start" class="button gen-module">
         New Game
-    </button>
+      </button>
+      <button id="hint" class="button gen-module">
+        Show Move
+      </button>
+    </div>
   </div>
 
 

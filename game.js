@@ -16,6 +16,9 @@ var board = new Board(size);
 // load a rule
 var rules = new Rules(board);
 
+
+var hintElems = [];
+
 //TODO: figure out when to add crush state check
 
 // Attaching events on document because then we can do it without waiting for
@@ -24,26 +27,46 @@ Util.events(document, {
 	// Final initalization entry point: the Javascript code inside this block
 	// runs at the end of start-up when the DOM is ready
 	"DOMContentLoaded": function() {
+		// Set css variable for board size
+		Util.one("#body").style.setProperty("--size", size);
 		// Draw grid
 		drawGrid();
 
 		// Element refs
 		dom.controlColumn = Util.one("#controls"); // example
 
-		// Add events
+		// Add events for new game
 		Util.one("#start").addEventListener("click", () => {
-			rules.prepareNewGame();
-			// reset all other fields
-			let input = document.getElementById("input-move");
-			input.value = "";
-			disableAllDirButtons();
-			checkCrushState();
-			input.focus();
+			startGame();
+		});
+
+		Util.one("#hint").addEventListener("click", () => {
+			disableHints();
+			Util.delay(0);
+			let move = rules.getRandomValidMove();
+			// using the helper method because specs changed? and the rules.js functions were not
+			// re-written to account for this
+			let hintCandies = rules.getCandiesToCrushGivenMove(move.candy, move.direction);
+			for (let i = 0; i < hintCandies.length; i++) {
+				let row = hintCandies[i].row;
+				let col = hintCandies[i].col;
+				let cell = document.getElementById(getCellID(row, col));
+				// TODO: better way to do this?
+				let img = cell.childNodes[0];
+				window.requestAnimationFrame(() => {
+					// apply asynchronously
+					img.classList.add("hint-anim");
+
+				});
+				hintElems.push(img);
+			}
 		});
 
 		// give each direction button a listener for when it is clicked
 		Util.all(".dir").forEach((element) => {
-			element.addEventListener('click', (evt) => {
+			element.addEventListener("click", (evt) => {
+				// disable hints
+				disableHints();
 				let input = document.getElementById("input-move");
 				let inputText = input.value.toLowerCase();
 				let dir = element.id;
@@ -65,14 +88,11 @@ Util.events(document, {
 			button.classList.add("disabled");
 			button.disabled = true;
 			rules.removeCrushes(rules.getCandyCrushes());
+			checkAvailableMoves();
 			setTimeout(handleMoveCandies, 500, checkCrushState);
 		});
 
-		// always start with a game
-		rules.prepareNewGame();
-		disableAllDirButtons();
-		checkCrushState();
-		document.getElementById("input-move").focus();
+		startGame();
 	},
 
 	// Keyboard events arrive here
@@ -86,6 +106,18 @@ Util.events(document, {
 	}
 });
 
+var startGame = () => {
+	rules.prepareNewGame();
+	// reset all other fields
+	board.resetScore();
+	disableAllDirButtons();
+	checkCrushState();
+	checkAvailableMoves();
+	let input = document.getElementById("input-move");
+	input.value = "";
+	input.focus();
+}
+
 // Attaching events to the board
 Util.events(board, {
 	// add a candy to the board
@@ -96,6 +128,7 @@ Util.events(board, {
 	// move a candy from location 1 to location 2
 	"move": function(e) {
 		setCandy(e.detail);
+		// TODO work on here
 	},
 
 	// remove a candy from the board
@@ -109,7 +142,11 @@ Util.events(board, {
 
 	// update the score
 	"scoreUpdate": function(e) {
-		// Your code here. To be implemented in PS3.
+		Util.one("#score").textContent = e.detail.score;
+		Util.one("#scoreboard").className = "gen-module";
+		if (e.detail.candy) {
+			Util.one("#scoreboard").classList.add(e.detail.candy.color);
+		}
 	},
 });
 
@@ -157,17 +194,20 @@ var drawGrid = () => {
 }
 
 // maps candy rep column to letter label
-let colToLetter = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h"}
+let colToLetter = {
+	0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h", 8: "i", 9: "j"}
 var getColLetter = (c) => {
 	return colToLetter[c];
 }
 
 // maps letter label to candy rep column
-let letterToCol = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
+let letterToCol = {
+	"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "i": 8, "j": 9}
 var getColNumber = (c) => {
 	return letterToCol[c];
 }
 
+// 0-indexed
 var getCellID = (row, col) => {
 	return "cell-" + row + "-" + col;
 }
@@ -186,15 +226,27 @@ var removeAllChildren = (node) => {
 var validateInput = () => {
 	let input = document.getElementById("input-move");
 	let inputText = input.value.toLowerCase();
-	if (inputText.length >= 2) {
-		if (inputText.match(/^[a-h][1-8]$/)) {
-			validateDirButtons(inputText);
-		} else {
-			disableAllDirButtons();
-		}
+	if (inputTextValid(inputText)) {
+		validateDirButtons(inputText);
+		Util.one("#input-move").classList.remove("bad-input");
+	} else if (inputText.length == 0) {
+		Util.one("#input-move").classList.remove("bad-input");
+		disableAllDirButtons();
 	} else {
+		Util.one("#input-move").classList.add("bad-input");
 		disableAllDirButtons();
 	}
+}
+
+var inputTextValid = (inputText) => {
+	let re;
+	if (size < 10) {
+		re = new RegExp("^[a-" + getColLetter(size - 1) + "][1-" + size + "]$");
+	} else {
+		// because regex is being silly for 10
+		re = new RegExp("^[a-i]([1-9]|10)$");
+	}
+	return inputText.match(re);
 }
 
 const dirs = ["up", "left", "right", "down"]
@@ -242,11 +294,20 @@ var disableButton = (id) => {
 	element.classList.add("disabled");
 }
 
+var disableHints = () => {
+	for (let i = 0; i < hintElems.length; i++) {
+		hintElems[i].classList.remove("hint-anim");
+	}
+	// clear
+	hintElems.length = 0;
+}
+
 // check crush state, re-enable and disable components as necessary
 var checkCrushState = () => {
 	let crushes = rules.getCandyCrushes();
 	if (crushes.length > 0) {
 		enableButton("crush");
+		disableButton("hint");
 		disableDirControls();
 	} else {
 		disableButton("crush");
@@ -255,6 +316,16 @@ var checkCrushState = () => {
 		input.classList.remove("disabled");
 		input.disabled = false;
 		input.focus();
+	}
+}
+
+checkAvailableMoves = () => {
+	if (rules.getRandomValidMove()) {
+		console.log("YES");
+		enableButton("hint");
+	} else {
+		console.log("NO");
+		disableButton("hint");
 	}
 }
 

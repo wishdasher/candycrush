@@ -1,10 +1,10 @@
 /* Global variables */
 :root {
-	--color-light-gray: hsl(220, 10%, 85%);
+	/*--color-light-gray: hsl(220, 10%, 85%);*/
 	--color-red: hsl(0, 80%, 48%);
+	--color-orange: hsl(30, 100%, 50%);
 	--color-yellow: gold;
 	--color-green: hsl(85, 90%, 37%);
-	--color-orange: hsl(30, 100%, 50%);
 	--color-blue: hsl(210, 80%, 45%);
 	--color-purple: purple;
 	--color-accent: #3399ff;
@@ -15,6 +15,13 @@
 
 	--radius: 5px;
 	--label-font-size: 20px;
+	--label-font-size-small: 12px;
+
+	--size: 8;
+
+	--duration-move: 2s;
+	--duration-fade: 2s;
+
 }
 
 html {
@@ -38,13 +45,12 @@ header {
 }
 
 main {
-	display: grid;
-	grid-template-columns: 1fr 50% 2fr;
-	grid-gap: 10px;
+	display: flex;
+	flex-direction: row;
 }
 
 .panel {
-	vertical-align: center;
+	margin: 10px;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -52,52 +58,59 @@ main {
 
 #gen {
 	grid-column: 1;
-	/*background-color: red;*/
 	text-align: center;
-	color: var(--color-blue);
+	width: 140px;
 }
 
 #title {
+	margin: 5px;
+	color: var(--color-blue);
+}
+
+#scoreboard {
+	padding: 10px;
+	background-color: var(--color-light-grey);
+}
+
+#score {
+	font-size: 60px;
 }
 
 #start {
 	background-color: var(--color-blue);
+	width: 130px;
+}
+
+#hint {
+	background-color: var(--color-accent);
+	width: 130px;
+}
+
+.gen-module {
+	margin: 5px;
 	color: white;
 	font-weight: bold;
-	font-size: var(--label-font-size);
+	border-radius: var(--radius);
 }
 
 #game {
 	grid-column: 2;
-	/*background-color: green;*/
 	display: flex;
-	/*justify-content: center;*/
-	align-items: center;
+	/*align-items: center;*/
+	/*max-width: 400px;*/
 }
 
 #board {
-	width: 450px;
-	height: 450px;
+	width: 400px;
+	height: 400px;
+	max-width: 80vw;
+	max-height: 80vw;
 
 	display: grid;
-	grid-template-rows: repeat(9, 1fr);
-	grid-template-columns: repeat(9, 1fr);
+	grid-template-rows: repeat(calc(var(--size) + 1), 1fr);
+	grid-template-columns: repeat(calc(var(--size) + 1), 1fr);
 
 	border-collapse: collapse;
-
-	/*grid-gap: var(--grid-gap);*/
-	/*background-color: grey;*/
-
-	/*border: 1px solid grey;*/
-
-
-	/* Variables to use in creating the board */
-	--grid-color: silver;
-	--board-size: 400px;
-	--grid-gap: 1px;
-	--size: 8;
-	--cell-outer: calc(var(--board-size) / var(--size));
-	--cell: calc(var(--cell-outer) - var(--grid-gap));
 }
 
 .label {
@@ -111,7 +124,7 @@ main {
 	justify-content: center;
 	font-weight: bold;
 	font-family: Arial;
-	font-size: var(--label-font-size);
+	font-size: calc(200px / (var(--size) + 1));
 }
 
 .candy-cell {
@@ -123,19 +136,20 @@ main {
 	margin-left: -1px;
 	margin-bottom: -1px;
 	/*below two properties added for firefox...*/
-	max-height: 50px;
-	max-width: 50px
+	max-width: calc(400px / (var(--size) + 1));
+	max-height: calc(400px / (var(--size) + 1));
 }
 
 #controls {
 	grid-column: 3;
+	max-width: 80vw;
 	/*background-color: blue;*/
 }
 
 #dir-panel {
 	display: grid;
 	grid-gap: 10px;
-	margin-top: 100px;
+	margin-top: 80px;
 }
 
 #left {
@@ -166,14 +180,22 @@ main {
 	padding: 0;
 	text-align: center;
 	border-radius: var(--radius);
-	outline: 1px solid grey;
+	border: 1px solid grey;
+	box-sizing: border-box;
+}
+
+.bad-input {
+	background-color: pink;
 }
 
 #crush {
-	grid-area: 4 / 2;
+	grid-row: 4;
+	grid-column: 1 / span 3;
 	font-weight: bold;
 	color: white;
 	background-color: var(--color-orange);
+	width: 140px;
+	justify-self: center;
 }
 
 .dir {
@@ -186,13 +208,12 @@ main {
 	border-radius: var(--radius);
 	height: 50px;
 	font-size: var(--label-font-size);
-	width: 140px;
+	width: 80px;
 }
 
 .disabled {
 	color: var(--color-dark-grey) !important;
 	background-color: var(--color-light-grey) !important;
-	/*outline: 0 !important;*/
 }
 
 button {
@@ -210,3 +231,80 @@ button {
 	max-width:100%;
 	max-height:100%;
 }
+
+.hint-anim {
+	animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: saturate(100%);
+  }
+  50% {
+    transform: scale(1.15);
+    filter: saturate(200%);
+  }
+}
+
+@media only screen and (max-width: 875px) and (min-width: 431px) {
+	main {
+		flex-direction: column;
+		align-items: center;
+	}
+	#gen {
+		max-width: 200px;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+	#dir-panel {
+		margin-top: 0px;
+	}
+}
+
+@media only screen and (max-width: 430px) {
+	main {
+		flex-direction: column;
+		align-items: center;
+	}
+	.button {
+		height: 30px;
+		max-width: 100px;
+		font-size: var(--label-font-size-small) !important;
+	}
+	#title {
+		font-size: var(--label-font-size) !important;
+	}
+	#gen {
+		display: flex;
+		flex-direction: column;
+		max-width: 120px;
+	}
+	.text-cell {
+		max-width: calc(80vw / (var(--size) + 1));
+		max-height: calc(80vw / (var(--size) + 1));
+		font-size: calc(50vw / (var(--size) + 1)) !important;
+	}
+	.candy-cell {
+		max-width: calc(80vw / (var(--size) + 1));
+		max-height: calc(80vw / (var(--size) + 1));
+	}
+	.control {
+		height: 35px;
+		width: 35px;
+	}
+	#dir-panel {
+		margin-top: 0px;
+	}
+}
+
+/* color classes */
+.red { background-color: var(--color-red) !important; }
+.orange { background-color: var(--color-orange) !important; }
+.yellow { background-color: var(--color-yellow) !important; 
+	color: var(--color-accent) !important; }
+.green { background-color: var(--color-green) !important; }
+.blue { background-color: var(--color-blue) !important; }
+.purple { background-color: var(--color-purple) !important; }
+
