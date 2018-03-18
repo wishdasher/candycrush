@@ -262,6 +262,7 @@ ANIMATION CLASSES
 
 .anim-fade {
 	animation: fade var(--duration-fade);
+	animation-fill-mode: forwards;
 }
 
 @keyframes fade {
@@ -275,6 +276,7 @@ ANIMATION CLASSES
 
 .anim-move {
 	animation: slide var(--duration-move);
+	animation-fill-mode: forwards;
 }
 
 @keyframes slide {
