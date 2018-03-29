@@ -341,11 +341,10 @@ ANIMATION CLASSES
 }
 
 /* color classes */
-.red { background-color: var(--color-red) !important; }
-.orange { background-color: var(--color-orange) !important; }
-.yellow { background-color: var(--color-yellow) !important;
-	color: var(--color-accent) !important; }
-.green { background-color: var(--color-green) !important; }
-.blue { background-color: var(--color-blue) !important; }
-.purple { background-color: var(--color-purple) !important; }
+#scoreboard.red { background-color: var(--color-red) }
+#scoreboard.orange { background-color: var(--color-orange) }
+#scoreboard.yellow { background-color: var(--color-yellow); color: var(--color-accent) }
+#scoreboard.green { background-color: var(--color-green) }
+#scoreboard.blue { background-color: var(--color-blue) }
+#scoreboard.purple { background-color: var(--color-purple) }
 
