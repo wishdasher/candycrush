@@ -78,11 +78,6 @@ main {
 	width: 130px;
 }
 
-#hint {
-	background-color: var(--color-accent);
-	width: 130px;
-}
-
 .gen-module {
 	margin: 5px;
 	color: white;
@@ -196,16 +191,6 @@ main {
 
 .bad-input {
 	background-color: pink;
-}
-
-#crush {
-	grid-row: 4;
-	grid-column: 1 / span 3;
-	font-weight: bold;
-	color: white;
-	background-color: var(--color-orange);
-	width: 140px;
-	justify-self: center;
 }
 
 .dir {

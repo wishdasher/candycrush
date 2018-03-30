@@ -19,9 +19,9 @@ var rules = new Rules(board);
 
 var hintElems = [];
 
-let durationFactor = 0.15;
+var hintTimeout;
 
-//TODO: figure out when to add crush state check
+let durationFactor = 0.15;
 
 // Attaching events on document because then we can do it without waiting for
 // the DOM to be ready (i.e. before DOMContentLoaded fires)
@@ -42,33 +42,11 @@ Util.events(document, {
 			startGame();
 		});
 
-		Util.one("#hint").addEventListener("click", () => {
-			disableHints();
-			Util.delay(0);
-			let move = rules.getRandomValidMove();
-			// using the helper method because specs changed? and the rules.js functions were not
-			// re-written to account for this
-			let hintCandies = rules.getCandiesToCrushGivenMove(move.candy, move.direction);
-			for (let i = 0; i < hintCandies.length; i++) {
-				let row = hintCandies[i].row;
-				let col = hintCandies[i].col;
-				let img = getCandyImgFromRowCol(row, col);
-				hintElems.push(img);
-			}
-			// add hint animation
-			window.requestAnimationFrame(() => {
-				hintElems.forEach(e => e.classList.add("anim-hint"));
-			});
-			// focus input cell
-			let input = document.getElementById("input-move");
-			input.focus();
-		});
-
 		// give each direction button a listener for when it is clicked
 		Util.all(".dir").forEach((element) => {
 			element.addEventListener("click", (evt) => {
+				clearHint();
 				// disable hints
-				disableHints();
 				let input = document.getElementById("input-move");
 				let inputText = input.value.toLowerCase();
 				let dir = element.id;
@@ -80,40 +58,15 @@ Util.events(document, {
 				// reset input and focus
 				input.value = "";
 				input.focus();
-				checkCrushState();
+
+				crushCandies();
+
+				console.log("no crushes left");
+				disableAllDirButtons();
+				startHintTimeout();
 			});
 		});
 
-		// crush listener, implemented with timeout and callback
-		Util.one("#crush").addEventListener("click", () => {
-			let button = document.getElementById("crush");
-			button.classList.add("disabled");
-			button.disabled = true;
-			let crushes = rules.getCandyCrushes();
-			checkAvailableMoves();
-
-			let elements = [];
-			for (let i = 0; i < crushes.length; i++) {
-				for (let j = 0; j < crushes[i].length; j++) {
-					let row = crushes[i][j].row;
-					let col = crushes[i][j].col;
-					let img = getCandyImgFromRowCol(row, col);
-					elements.push(img);
-				}
-			}
-			// attach fade-out animation
-			window.requestAnimationFrame(() => {
-				elements.forEach(e => e.classList.add("anim-fade"));
-				Util.afterAnimation(elements, "fade").then(() => {
-					// TODO: Is this necessary? they all get deleted anyways
-					elements.forEach(e => e.classList.remove("anim-fade"));
-					rules.removeCrushes(crushes);
-					rules.moveCandiesDown();
-					checkCrushState();
-				});
-			});
-
-		});
 		// start game with page loads
 		startGame();
 	},
@@ -134,8 +87,8 @@ var startGame = () => {
 	rules.prepareNewGame();
 	board.resetScore();
 	disableAllDirButtons();
-	checkCrushState();
-	checkAvailableMoves();
+	clearHint();
+	startHintTimeout();
 	let input = document.getElementById("input-move");
 	input.value = "";
 	input.focus();
@@ -347,35 +300,82 @@ var disableButton = (id) => {
 	element.classList.add("disabled");
 }
 
-var disableHints = () => {
+// // check crush state, re-enable and disable components as necessary
+// var checkCrushState = () => {
+// 	let crushes = rules.getCandyCrushes();
+// 	if (crushes.length > 0) {
+// 		enableButton("crush");
+// 		disableDirControls();
+// 	} else {
+// 		disableButton("crush");
+// 		// re-enable input
+// 		let input = document.getElementById("input-move");
+// 		input.classList.remove("disabled");
+// 		input.disabled = false;
+// 		input.focus();
+// 	}
+// }
+
+var crushCandies = () => {
+	console.log("CRUSHING");
+	let crushes = rules.getCandyCrushes();
+
+	if (crushes.length == 0) {
+		return;
+	}
+
+	let elements = [];
+	for (let i = 0; i < crushes.length; i++) {
+		for (let j = 0; j < crushes[i].length; j++) {
+			let row = crushes[i][j].row;
+			let col = crushes[i][j].col;
+			let img = getCandyImgFromRowCol(row, col);
+			elements.push(img);
+		}
+	}
+	// attach fade-out animation
+	window.requestAnimationFrame(() => {
+		elements.forEach(e => e.classList.add("anim-fade"));
+		Util.afterAnimation(elements, "fade").then(() => {
+			// TODO: Is this necessary? they all get deleted anyways
+			elements.forEach(e => e.classList.remove("anim-fade"));
+			rules.removeCrushes(crushes);
+			rules.moveCandiesDown();
+			crushCandies();
+		});
+	});
+}
+
+// start hint timeout
+var startHintTimeout = () => {
+	hintTimeout = setTimeout(() => animateHint(), 5000);
+}
+
+var animateHint = () => {
+	Util.delay(0);
+	let move = rules.getRandomValidMove();
+	// using the helper method because specs changed? and the rules.js functions were not
+	// re-written to account for this
+	let hintCandies = rules.getCandiesToCrushGivenMove(move.candy, move.direction);
+	for (let i = 0; i < hintCandies.length; i++) {
+		let row = hintCandies[i].row;
+		let col = hintCandies[i].col;
+		let img = getCandyImgFromRowCol(row, col);
+		hintElems.push(img);
+	}
+	// add hint animation
+	window.requestAnimationFrame(() => {
+		hintElems.forEach(e => e.classList.add("anim-hint"));
+	});
+	// focus input cell
+	let input = document.getElementById("input-move");
+	input.focus();
+}
+
+var clearHint = () => {
+	clearTimeout(hintTimeout);
 	hintElems.forEach(e => e.classList.remove("anim-hint"));
 	hintElems.length = 0;
-}
-
-// check crush state, re-enable and disable components as necessary
-var checkCrushState = () => {
-	let crushes = rules.getCandyCrushes();
-	if (crushes.length > 0) {
-		enableButton("crush");
-		disableButton("hint");
-		disableDirControls();
-	} else {
-		disableButton("crush");
-		// re-enable input
-		let input = document.getElementById("input-move");
-		input.classList.remove("disabled");
-		input.disabled = false;
-		input.focus();
-	}
-}
-
-// if there is no valid moves, disable the hint button
-var checkAvailableMoves = () => {
-	if (rules.getRandomValidMove()) {
-		enableButton("hint");
-	} else {
-		disableButton("hint");
-	}
 }
 
 // assumes valid inputText
