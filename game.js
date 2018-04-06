@@ -110,6 +110,7 @@ Util.events(document, {
 		console.log(evt);
 		let targetCandy = evt.target.childNodes[0] || evt.target;
 		let sourceCandy = selectedDetails.candy;
+		selectedDetails.candy = null;
 		console.log(sourceCandy);
 		console.log(targetCandy);
 		// check if candy is being dragged, if target is actually a candy
@@ -123,16 +124,25 @@ Util.events(document, {
 				row: targetCandy.getAttribute("data-row"),
 				col: targetCandy.getAttribute("data-col")
 			};
-			let dir = getAdjacencyDir(sourceCandy, targetCandy);
-			if (adjacency) {
+			let dir = getAdjacencyDir(source, target);
+			console.log(dir);
+			if (dir) {
+				console.log("VALID MOVE");
 				flipCandies(board.getCandyAt(source.row, source.col), dir);
-
+				return;
 			}
-
-		// ekse animate back
 		}
-		selectedDetails.candy = null;
 
+		console.log("SNAPPING BACK");
+		sourceCandy.style.setProperty("--top", sourceCandy.style.top + "px");
+		sourceCandy.style.setProperty("--left", sourceCandy.style.left + "px");
+		window.requestAnimationFrame(() => {
+			sourceCandy.classList.add("anim-back");
+			Util.afterAnimation(sourceCandy, "back").then(() => {
+				sourceCandy.classList.remove("anim-back");
+				sourceCandy.classList.remove("moving");
+			});
+		});
 		evt.preventDefault();
 	},
 
@@ -307,18 +317,23 @@ var removeAllChildren = (node) => {
 }
 
 var getAdjacencyDir = (source, target) => {
-	if (source.row === target.row) {
-		if (source.col + 1 === target.col) {
+	let sRow = parseInt(source.row);
+	let sCol = parseInt(source.col);
+	let tRow = parseInt(target.row);
+	let tCol = parseInt(target.col);
+
+	if (sRow === tRow) {
+		if (sCol + 1 === tCol) {
 			return "right";
 		}
-		if (source.col - 1 === target.col) {
+		if (sCol - 1 === tCol) {
 			return "left";
 		}
-	} else if (source.col === target.col) {
-		if (source.row + 1 === target.row) {
+	} else if (sCol === tCol) {
+		if (sRow + 1 === tRow) {
 			return "down";
 		}
-		if (source.row - 1 === target.row) {
+		if (sRow - 1 === tRow) {
 			return "up";
 		}
 	}
