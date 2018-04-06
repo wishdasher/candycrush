@@ -103,25 +103,14 @@ main {
 	overflow: hidden;
 
 	display: grid;
-	grid-template-rows: repeat(calc(var(--size) + 1), 1fr);
-	grid-template-columns: repeat(calc(var(--size) + 1), 1fr);
+	grid-template-rows: repeat(var(--size), 1fr);
+	grid-template-columns: repeat(var(--size), 1fr);
 
 	border-collapse: collapse;
 }
 
 .label {
 	font-weight: bold;
-}
-
-.text-cell {
-	background-color: white;
-	opacity: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-weight: bold;
-	font-family: Arial;
-	font-size: calc(200px / (var(--size) + 1));
 }
 
 /* to mask incoming candies */
@@ -142,9 +131,15 @@ main {
 	margin-left: -1px;
 	margin-bottom: -1px;
 
-	max-width: calc(400px / (var(--size) + 1));
-	max-height: calc(400px / (var(--size) + 1));
+	max-width: calc(400px / (var(--size)));
+	max-height: calc(400px / (var(--size)));
 }
+
+.candy-cell img {
+/*	display: block;
+	max-width: 100%;
+	height: auto;
+*/}
 
 #controls {
 	grid-column: 3;
@@ -222,11 +217,18 @@ button {
 	font-size: var(--label-font-size);
 }
 
-.candy {
+.candy-image {
 	max-width:100%;
 	max-height:100%;
 }
 
+.moving {
+	/*top: var(--());
+	left: var(--());*/
+	pointer-events: noneA;
+	position: relative;
+	z-index: 100;
+}
 /*
 ANIMATION CLASSES
 */
