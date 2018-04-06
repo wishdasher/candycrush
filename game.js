@@ -54,9 +54,6 @@ Util.events(document, {
 		Util.all(".dir").forEach((element) => {
 			element.addEventListener("click", (evt) => {
 				clearHint();
-				// disable hints
-				// let input = document.getElementById("input-move");
-				// let inputText = input.value.toLowerCase();
 				let dir = element.id;
 				let candy = getCandyForInput(inputText);
 				// figure out if we can actually move, yo
@@ -66,12 +63,6 @@ Util.events(document, {
 					// to allow crushing (add wrapper in crushCandies)
 					setTimeout(() => crushCandies(), 100);
 				}
-				// reset input and focus
-				// input.value = "";
-				// input.focus();
-
-				// console.log("no crushes left");
-				// disableAllDirButtons();
 			});
 		});
 
@@ -86,7 +77,6 @@ Util.events(document, {
 
 	// Click events arrive here
 	"click": function(evt) {
-		// console.log(evt);
 		// Not used for now
 	},
 
@@ -150,15 +140,8 @@ Util.events(document, {
 		// ANCHOR
 		let candy = selectedDetails.candy;
 		if (candy) {
-			// console.log(evt);
-			// selectedCandy.style.top = parseInt(event.offsetY);
-			// selectedCandy.style.left = parseInt(event.offsetX);
 			candy.style.top = (parseInt(evt.clientY) - parseInt(selectedDetails.mouseY)) + "px";
 			candy.style.left = (parseInt(evt.clientX) - parseInt(selectedDetails.mouseX)) + "px";
-			// console.log(selectedDetails.mouseY + ", " + selectedDetails.mouseX);
-			// console.log(evt.clientY + ", " + evt.clientX);
-			// console.log("TOP " + candy.style.top);
-			// console.log("LEFT " + candy.style.left);
 		}
 		evt.preventDefault();
 	}
@@ -277,14 +260,6 @@ var drawGrid = () => {
 			candyBoard.appendChild(cell);
 		}
 	}
-	// Util.all(".candy-cell").forEach((element) => {
-	// 	element.addEventListener("mousedown", (evt) => {
-	// 		console.log(this);
-
-	// 		console.log(evt);
-	// 	});
-	// });
-
 }
 
 // maps candy rep column to letter label
@@ -339,64 +314,6 @@ var getAdjacencyDir = (source, target) => {
 	}
 	return "";
 }
-// // given the input, figure out what to do about buttons
-// var validateInput = () => {
-// 	let input = document.getElementById("input-move");
-// 	let inputText = input.value.toLowerCase();
-// 	if (inputTextValid(inputText)) {
-// 		validateDirButtons(inputText);
-// 		Util.one("#input-move").classList.remove("bad-input");
-// 	} else if (inputText.length == 0) {
-// 		Util.one("#input-move").classList.remove("bad-input");
-// 		disableAllDirButtons();
-// 	} else {
-// 		Util.one("#input-move").classList.add("bad-input");
-// 		disableAllDirButtons();
-// 	}
-// }
-
-// // figure out custom regexes given the board size
-// var inputTextValid = (inputText) => {
-// 	let re;
-// 	if (size < 10) {
-// 		re = new RegExp("^[a-" + getColLetter(size - 1) + "][1-" + size + "]$");
-// 	} else {
-// 		// because regex is being silly for 10
-// 		re = new RegExp("^[a-i]([1-9]|10)$");
-// 	}
-// 	return inputText.match(re);
-// }
-
-const dirs = ["up", "left", "right", "down"]
-
-// check if directional buttons should be enabled or disabled
-// var validateDirButtons = (inputText) => {
-// 	for (let i = 0; i < dirs.length; i++) {
-// 		let candy = getCandyForInput(inputText);
-// 		if (rules.isMoveTypeValid(candy, dirs[i])) {
-// 			enableButton(dirs[i]);
-// 		} else {
-// 			disableButton(dirs[i]);
-// 		}
-// 	}
-// }
-
-// disable all directional controls, including the input field
-// var disableDirControls = () => {
-// 	// disable buttles
-// 	disableAllDirButtons();
-// 	// disable input
-// 	let input = document.getElementById("input-move");
-// 	input.classList.add("disabled");
-// 	input.disabled = true;
-// }
-
-// // disable all the directional buttons
-// var disableAllDirButtons = () => {
-// 	for (let i = 0; i < dirs.length; i++) {
-// 		disableButton(dirs[i]);
-// 	}
-// }
 
 // takes button dID to enable
 var enableButton = (id) => {
@@ -411,22 +328,6 @@ var disableButton = (id) => {
 	element.disabled = true;
 	element.classList.add("disabled");
 }
-
-// // check crush state, re-enable and disable components as necessary
-// var checkCrushState = () => {
-// 	let crushes = rules.getCandyCrushes();
-// 	if (crushes.length > 0) {
-// 		enableButton("crush");
-// 		disableDirControls();
-// 	} else {
-// 		disableButton("crush");
-// 		// re-enable input
-// 		let input = document.getElementById("input-move");
-// 		input.classList.remove("disabled");
-// 		input.disabled = false;
-// 		input.focus();
-// 	}
-// }
 
 var crushCandies = () => {
 	console.log("CRUSHING");
@@ -491,9 +392,6 @@ var animateHint = () => {
 	window.requestAnimationFrame(() => {
 		hintElems.forEach(e => e.classList.add("anim-hint"));
 	});
-	// focus input cell
-	// let input = document.getElementById("input-move");
-	// input.focus();
 }
 
 var clearHint = () => {
@@ -501,12 +399,6 @@ var clearHint = () => {
 	hintElems.forEach(e => e.classList.remove("anim-hint"));
 	hintElems.length = 0;
 }
-
-// assumes valid inputText
-// var getCandyForInput = (inputText) => {
-// 	return board.getCandyAt(parseInt(inputText.substring(1)) - 1, getColNumber(inputText[0]));
-// }
-
 
 var getCandyImgFromRowCol = (row, col) => {
 	let cell = document.getElementById(getCellID(row, col));
