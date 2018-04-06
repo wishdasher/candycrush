@@ -141,66 +141,6 @@ main {
 	height: auto;
 */}
 
-#controls {
-	grid-column: 3;
-	max-width: 80vw;
-}
-
-#dir-panel {
-	display: grid;
-	grid-gap: 10px;
-	margin-top: 80px;
-}
-
-#left {
-	grid-area: 2 / 1;
-	background-color: var(--color-green);
-}
-
-#up {
-	grid-area: 1 / 2;
-	background-color: var(--color-blue);
-
-}
-
-#right {
-	grid-area: 2 / 3;
-	background-color: var(--color-red);
-
-}
-
-#down {
-	grid-area: 3 / 2;
-	background-color: var(--color-yellow);
-}
-
-
-#input-move {
-	grid-area: 2 / 2;
-	padding: 0;
-	text-align: center;
-	border-radius: var(--radius);
-	border: 1px solid grey;
-	box-sizing: border-box;
-}
-
-.bad-input {
-	background-color: pink;
-}
-
-.dir {
-	color: white;
-}
-
-.control {
-	border: 0;
-	box-shadow: none;
-	border-radius: var(--radius);
-	height: 50px;
-	font-size: var(--label-font-size);
-	width: 80px;
-}
-
 .disabled {
 	color: var(--color-dark-grey) !important;
 	background-color: var(--color-light-grey) !important;
@@ -286,9 +226,6 @@ ANIMATION CLASSES
 		flex-direction: row;
 		align-items: center;
 	}
-	#dir-panel {
-		margin-top: 0px;
-	}
 }
 
 @media only screen and (max-width: 430px) {
@@ -309,18 +246,9 @@ ANIMATION CLASSES
 		flex-direction: column;
 		max-width: 120px;
 	}
-	.text-cell {
-		max-width: calc(80vw / (var(--size) + 1));
-		max-height: calc(80vw / (var(--size) + 1));
-		font-size: calc(50vw / (var(--size) + 1)) !important;
-	}
 	.candy-cell {
 		max-width: calc(80vw / (var(--size) + 1));
 		max-height: calc(80vw / (var(--size) + 1));
-	}
-	.control {
-		height: 35px;
-		width: 35px;
 	}
 	#dir-panel {
 		margin-top: 0px;
