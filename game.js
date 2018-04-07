@@ -58,7 +58,16 @@ Util.events(document, {
 				let candy = getCandyForInput(inputText);
 				// figure out if we can actually move, yo
 				if (rules.isMoveTypeValid(candy, dir)) { //TODO: remove because we now disable the button for an invalid move
+					let candyObjce
 					board.flipCandies(candy, board.getCandyInDirection(candy, dir));
+
+						if (rules.isMoveTypeValid(candy, dir)) { //TODO: remove because we now disable the button for an invalid move
+							board.flipCandies(candy, board.getCandyInDirection(candy, dir));
+							// TODO or work with a promise after things were switched
+							// to allow crushing (add wrapper in crushCandies)
+							setTimeout(() => crushCandies(), 100);
+						}
+
 					// TODO or work with a promise after things were switched
 					// to allow crushing (add wrapper in crushCandies)
 					setTimeout(() => crushCandies(), 100);
@@ -115,11 +124,15 @@ Util.events(document, {
 				col: targetCandy.getAttribute("data-col")
 			};
 			let dir = getAdjacencyDir(source, target);
-			console.log(dir);
 			if (dir) {
-				console.log("VALID MOVE");
-				flipCandies(board.getCandyAt(source.row, source.col), dir);
-				return;
+				let candy = board.getCandyAt(source.row, source.col);
+				if (rules.isMoveTypeValid(candy, dir)) { //TODO: remove because we now disable the button for an invalid move
+					board.flipCandies(candy, board.getCandyInDirection(candy, dir));
+					// TODO or work with a promise after things were switched
+					// to allow crushing (add wrapper in crushCandies)
+					setTimeout(() => crushCandies(), 100);
+					return;
+				}
 			}
 		}
 
@@ -219,15 +232,6 @@ var handleCandyIn = (detail, adding) => {
 			});
 		});
 
-	}
-}
-
-var flipCandies = (candy, dir) => {
-	if (rules.isMoveTypeValid(candy, dir)) { //TODO: remove because we now disable the button for an invalid move
-		board.flipCandies(candy, board.getCandyInDirection(candy, dir));
-		// TODO or work with a promise after things were switched
-		// to allow crushing (add wrapper in crushCandies)
-		setTimeout(() => crushCandies(), 100);
 	}
 }
 
@@ -334,7 +338,9 @@ var crushCandies = () => {
 	let crushes = rules.getCandyCrushes();
 
 	if (crushes.length === 0) {
-		startHintTimeout();
+		if (!(hintTimeout)) {
+			startHintTimeout();
+		}
 		return;
 	}
 
