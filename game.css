@@ -19,7 +19,6 @@
 	--label-font-size-small: 12px;
 
 	--size: 8;
-
 }
 
 html {
@@ -35,11 +34,6 @@ body {
 	z-index: -1;
 }
 
-.wrapper {
-
-}
-
-/* REMOVE borders from columns*/
 header {
 
 }
@@ -91,8 +85,6 @@ main {
 #game {
 	grid-column: 2;
 	display: flex;
-	/*align-items: center;*/
-	/*max-width: 400px;*/
 }
 
 #board {
@@ -137,12 +129,6 @@ main {
 	max-width: calc(400px / (var(--size)));
 	max-height: calc(400px / (var(--size)));
 }
-
-.candy-cell img {
-/*	display: block;
-	max-width: 100%;
-	height: auto;
-*/}
 
 .disabled {
 	color: var(--color-dark-grey) !important;
@@ -263,9 +249,6 @@ ANIMATION CLASSES
 		max-width: calc(80vw / (var(--size) + 1));
 		max-height: calc(80vw / (var(--size) + 1));
 	}
-	#dir-panel {
-		margin-top: 0px;
-	}
 }
 
 /* color classes */
@@ -275,4 +258,3 @@ ANIMATION CLASSES
 #scoreboard.green { background-color: var(--color-green) }
 #scoreboard.blue { background-color: var(--color-blue) }
 #scoreboard.purple { background-color: var(--color-purple) }
-

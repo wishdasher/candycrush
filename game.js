@@ -92,6 +92,7 @@ Util.events(document, {
 	// MOUSE EVENTS HERE
 
 	"mousedown": function(evt) {
+		clearTimeout();
 		// if clicked on the div, grabs the image which is childNodes[0]
 		// otherwise grabs the target, which should be the candy image
 		let candy = evt.target.childNodes[0] || evt.target;
@@ -110,10 +111,11 @@ Util.events(document, {
 		let targetCandy = evt.target.childNodes[0] || evt.target;
 		let sourceCandy = selectedDetails.candy;
 		selectedDetails.candy = null;
+		if (!(sourceCandy)) { return; }
 		console.log(sourceCandy);
 		console.log(targetCandy);
 		// check if candy is being dragged, if target is actually a candy
-		if (sourceCandy && targetCandy.classList &&
+		if (targetCandy.classList &&
 			targetCandy.classList.contains("candy-image")) {
 			let source = {
 				row: sourceCandy.getAttribute("data-row"),
@@ -146,11 +148,11 @@ Util.events(document, {
 				sourceCandy.classList.remove("moving");
 			});
 		});
+		startHintTimeout();
 		evt.preventDefault();
 	},
 
 	"mousemove": function(evt) {
-		// ANCHOR
 		let candy = selectedDetails.candy;
 		if (candy) {
 			candy.style.top = (parseInt(evt.clientY) - parseInt(selectedDetails.mouseY)) + "px";
@@ -158,8 +160,6 @@ Util.events(document, {
 		}
 		evt.preventDefault();
 	}
-
-
 });
 
 // start a new game, resets fields, scores
@@ -264,20 +264,6 @@ var drawGrid = () => {
 			candyBoard.appendChild(cell);
 		}
 	}
-}
-
-// maps candy rep column to letter label
-let colToLetter = {
-	0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h", 8: "i", 9: "j"}
-var getColLetter = (c) => {
-	return colToLetter[c];
-}
-
-// maps letter label to candy rep column
-let letterToCol = {
-	"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "i": 8, "j": 9}
-var getColNumber = (c) => {
-	return letterToCol[c];
 }
 
 // 0-indexed
